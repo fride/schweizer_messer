@@ -9,7 +9,10 @@
 
     <name>example1</name>
     <url>http://maven.apache.org</url>
+    <description>
+        Simple example project tat shows a jax-rs app with scala. More to come!
 
+    </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.9.1</scala.version>
