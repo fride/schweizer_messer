@@ -74,6 +74,59 @@ val properties = attempt("Couldn't read properties") {
 
 	</pre>
 </section>
+<section class="slide" id="Zitat1">
+	<h2>Zitate die gut zu Scala passen</h2>
+	<blockquote>Entschuldigen Sie, dass ich Ihnen einen langen Brief schreibe, für einen kurzen habe ich keine Zeit.</blockquote>
+	<p>Blaise Pascal<br/>Voltair<br/>Goethe<br/>Mark Twain<br/>Karl Marx</p>
+</section>
+<section class="slide" id="Zitat2">
+	<h2>Zitate die gut zu Scala passen</h2>
+	<blockquote>Ordnung brauch nur der Dumme, das Genie beherrscht das Chaos.</blockquote>
+	<p>Albert Einstein</p>
+</section>
+<section class="slide" id="TestMotivation">
+	<h2>Warum sollen wir testen?</h2>
+	<ul>
+		<li>Beschreibung eigener Absichten</li>
+		<li>Benutzung eigener Komponenten</li>
+		<li>Selbstvertrauen durch Rückmeldung</li>
+		<li>Sicheres Refactoring</li>
+		<li>Debugging</li>
+	</ul>
+</section>
+<section class="slide" id="JUnit">
+	<h2>Das alte gute JUnit</h2>
+	<ul>
+		<li>Perfekt aus technischer Sicht</li>
+		<li>Braucht öfters Aufputschmittel: Hamcrest, Mockito, DBUnit etc..</li>
+		<li>Nicht so gut, wenn es um Beschreibung und Kommunikation geht</li>
+	</ul>
+</section>
+<section class="slide" id="ScalaTest1">
+	<h1>ScalaTest das Schweizer Taschenmesser fürs Testen</h1>
+</section>
+<section class="slide" id="ScalaTest2">
+	<h1>Läuft mit <code>JUnitRunner</code> oder in Konsole</h1>
+</section>
+<section class="slide" id="ScalaTest3">
+	<h2>Wie JUnit</h2>
+	<pre class="sh_scala">		
+		import org.junit.runner.RunWith
+		import org.scalatest.junit.JUnitRunner
+		import org.scalatest.Suite
+
+		@RunWith(classOf[JUnitRunner])
+		class AlmostJunitTest extends Suite {
+			def testMe(){
+			  assert("maxim".size == 5);
+			}
+			def testMeAgain(){
+			  assert("maxim".size == 6);
+			}
+		}
+	</pre>
+</section>
+
 
 <!-- deck.navigation snippet -->
 <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
