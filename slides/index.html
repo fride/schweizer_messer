@@ -76,13 +76,17 @@ val properties = attempt("Couldn't read properties") {
 </section>
 <section class="slide" id="Zitat1">
 	<h2>Zitate die gut zu Scala passen</h2>
-	<blockquote>Entschuldigen Sie, dass ich Ihnen einen langen Brief schreibe, für einen kurzen habe ich keine Zeit.</blockquote>
-	<p>Blaise Pascal<br/>Voltair<br/>Goethe<br/>Mark Twain<br/>Karl Marx</p>
+	<blockquote cite="http://example.com">
+		<p>Entschuldigen Sie, dass ich Ihnen einen langen Brief schreibe, für einen kurzen habe ich keine Zeit.</p>
+		<p><cite>Blaise Pascal, Voltair, Goethe, Mark Twain, Karl Marx</cite></p>
+	</blockquote>
 </section>
 <section class="slide" id="Zitat2">
 	<h2>Zitate die gut zu Scala passen</h2>
-	<blockquote>Ordnung brauch nur der Dumme, das Genie beherrscht das Chaos.</blockquote>
-	<p>Albert Einstein</p>
+	<blockquote cite="http://example.com">
+		<p>Ordnung brauch nur der Dumme, das Genie beherrscht das Chaos.</p>
+		<p><cite>Albert Einstein</cite></p>
+	</blockquote>
 </section>
 <section class="slide" id="TestMotivation">
 	<h2>Warum sollen wir testen?</h2>
@@ -102,31 +106,99 @@ val properties = attempt("Couldn't read properties") {
 		<li>Nicht so gut, wenn es um Beschreibung und Kommunikation geht</li>
 	</ul>
 </section>
+
 <section class="slide" id="ScalaTest1">
 	<h1>ScalaTest das Schweizer Taschenmesser fürs Testen</h1>
 </section>
+
 <section class="slide" id="ScalaTest2">
 	<h1>Läuft mit <code>JUnitRunner</code> oder in Konsole</h1>
 </section>
+
 <section class="slide" id="ScalaTest3">
 	<h2>Wie JUnit</h2>
 	<pre class="sh_scala">		
-		import org.junit.runner.RunWith
-		import org.scalatest.junit.JUnitRunner
-		import org.scalatest.Suite
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.Suite
 
-		@RunWith(classOf[JUnitRunner])
-		class AlmostJunitTest extends Suite {
-			def testMe(){
-			  assert("maxim".size == 5);
-			}
-			def testMeAgain(){
-			  assert("maxim".size == 6);
-			}
-		}
+@RunWith(classOf[JUnitRunner])
+class AlmostJunitTest extends Suite {
+	def testMe(){
+	  assert("maxim".size == 5);
+	}
+	def testMeAgain(){
+	  assert("maxim".size == 6);
+	}
+}
+</pre>
+</section>
+
+<section class="slide" id="ScalaTest4">
+	<h2>Sogar besser als JUnit</h2>
+	<pre class="sh_scala">		
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.FunSuite
+
+@RunWith(classOf[JUnitRunner])
+class BetterThanJunit extends FunSuite {
+	test("Mein Name besteht aus 5 buchstaben"){
+	  assert("maxim".size == 5);
+	}
+	test("Mein Name besteht aus 6 buchstaben"){
+	  assert("maxim".size == 6);
+	}
+}
 	</pre>
 </section>
 
+<section class="slide" id="ScalaTest5">
+	<h1>Traits als Mechanismus zur Erweiterung der Test Sprache</h1>
+</section>
+
+<section class="slide" id="ScalaTest6">
+	<h2>Matchers ohne Hamcrest</h2>
+	<pre class="sh_scala">		
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.FunSuite
+import org.scalatest.matchers.ShouldMatchers
+
+@RunWith(classOf[JUnitRunner])
+class TestWithMatcher extends FunSuite with ShouldMatchers {
+  test("Mein Name besteht aus 5 Buchstaben") {
+    "maxim" should have length(5)
+  }
+  test("Mein Name besteht aus 6 Buchstaben") {
+    "maxim" should have length(6)
+  }
+}
+	</pre>
+</section>
+
+<section class="slide" id="ScalaTest7">
+	<h2>Vorbedingung, Ausführung, Nachbedingung</h2>
+	<pre class="sh_scala">		
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.FunSuite
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.GivenWhenThen
+
+@RunWith(classOf[JUnitRunner])
+class TestWithGivenWhenThen extends FunSuite with ShouldMatchers with GivenWhenThen{
+  test("Mein Name besteht aus 5 Buchstaben") {
+    given("Ein Name")
+    var name : String = null
+    when("der Name auf Maxim gesetzt ist")
+    name = "Maxim"
+    then("Name besteht aus 5 Buchstaben")  
+    name should have length(5)    
+  }
+}
+	</pre>
+</section>
 
 <!-- deck.navigation snippet -->
 <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
