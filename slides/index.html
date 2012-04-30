@@ -30,6 +30,12 @@
 
 	<script type="text/javascript" src="code/sh_main.min.js"></script>	
 	<script type="text/javascript" src="code/sh_scala.min.js"></script>
+
+	<!-- google prettify -->
+
+	<link href="prettify/prettify.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="prettify/prettify.js"></script>
+
 	<link type="text/css" rel="stylesheet" href="code/sh_style.css">
 
 	<script src="modernizr.custom.js"></script>
@@ -49,14 +55,14 @@
 
 <section class="slide" id="exceptions">
 	<h2>Exceptions - mal eine andere Option</h2>
-	<pre class="sh_scala">		
-def attempt[T](message: String)(action: => T): Option[T] =
+	<pre class="prettyprint lang-scala">
+def tryOr[T](message: String)(action: => T): Option[T] =
   try {
     Some(action)
   } catch {
     case e: Exception => println(message + "\n" + e.getMessage); None
   }
-val properties = attempt("Couldn't read properties") {
+val properties = tryOr("Couldn't read properties") {
   val props = new Properties()
   val in = new FileInputStream("Does_not_exist")
   try {
@@ -64,6 +70,101 @@ val properties = attempt("Couldn't read properties") {
     props
   } finally {
 	in.close()
+}
+	</pre>
+</section>
+
+
+<section class="slide" id="lazy">
+	<h2>Spring + Scala</h2>
+	<pre class="prettyprint lang-scala">
+class Laaazy {
+  lazy val bar = new Bar
+}
+
+public class VerboseLazy {
+  private volatile Bar bar = null;
+  public Bar getBar() {
+    if (bar == null) {
+      synchronized(this) {
+        if (bar == null)
+          bar = new Bar();
+      }
+    }
+    return bar;
+  }
+}
+
+	</pre>
+</section>
+<section class="slide" id="spring_config">
+	<h2>Spring + Scala</h2>
+	<pre class="prettyprint lang-scala">
+object ScalaObjectFactory extends ApplicationContextAware {
+
+  private[this] var ctx:AutowireCapableBeanFactory = _
+
+  def setApplicationContext(applicationContext: ApplicationContext) {
+    this.ctx = applicationContext.getAutowireCapableBeanFactory
+  }
+
+  def autowire[T](bean: T):T = {
+    if (null != ctx) {
+  		ctx.autowireBeanProperties(
+  		bean, 
+  		AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true)
+    }
+  bean
+  }
+}
+	</p>
+</section>
+
+<section class="slide" id="">
+	<h2>Pattern Matching + Function Composition + XML + Servlet API</h2>
+	<pre class="sh_scala">
+val server = new Server(8080);
+
+val handler = JettyPlan.planify {
+  case GET(Path("/hello/world")) =>
+    OK(TextResponse("Hello there!"))
+
+  case GET(Path(Seq("echo" :: text :: _))) =>
+    OK(TextResponse("you said: " + text))
+
+  case req:HttpServletRequest =>
+    NOT_FOUND(HTMLResponse(
+	  &lt;html&gt;
+	    &lt;body&gt;
+	      &lt;p&gt;Ich kann &lt;i&gt;{req.getRequestURI}&lt;/i&gt; nicht finden. Sorry!&lt;/p&gt;
+	      Powerd by Scala! Yuppi
+	    &lt;/body&gt;
+	  &lt;/html&gt;
+    ))
+}
+server.setHandler(handler)
+server.start()
+server.join()
+	</pre>
+</section>
+
+<section class="slide" id="unapply">
+	<h2>Path</h2>
+	<pre class="sh_scala">		
+object Path {
+
+  def apply(req: HttpServletRequest) = req.getRequestURI.split("\\?")(0)
+
+  def unapply(req: HttpServletRequest): Option[String] =
+    Some(req.getRequestURI.split("\\?")(0))
+}
+
+
+object Seq {
+  def unapply(path: String):Option[List[String]] = path.split("/").toList match {
+    case "" :: rest => Some(rest)
+    case all => Some(all)
+  }
 }
 	</pre>
 </section>
@@ -293,6 +394,7 @@ class TestAsFreeSpecification extends FreeSpec with ShouldMatchers {
 <script>
 $(function() {
 	$.deck('.slide');
+	prettyPrint();
 });
 </script>
 
