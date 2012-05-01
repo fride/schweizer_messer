@@ -351,6 +351,55 @@ class TestAsFreeSpecification extends FreeSpec with ShouldMatchers {
 </section>
 
 
+<section class="slide" id="ScalaTest10">
+	<h2>Datengetriebenes Test</h2>
+	<pre class="sh_scala">		
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FreeSpec
+import org.scalatest.prop.PropertyChecks
+
+@RunWith(classOf[JUnitRunner])
+class DataDrivenTest extends FreeSpec with ShouldMatchers with PropertyChecks{
+	"Namen sollen aus Buchstaben bestehen" - {
+	  val data = Table( ("Name", "Anzahl der Buchstaben"), 
+			  			("Maxim", 5), 
+			  			("Jan", 3));
+	  "alle Namen aus der Tabelle sollen richtige Azahl der Buchstaben haben" in {
+	    forAll (data) { (name, expectedLength) =>
+	    	name should have length(expectedLength)
+	    }	    
+	  }
+	}
+}
+	</pre>
+</section>
+
+<section class="slide" id="ScalaTest11">
+	<h2>Teste die Eigenschaften</h2>
+	<pre class="sh_scala">		
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FreeSpec
+import org.scalatest.prop.PropertyChecks
+
+@RunWith(classOf[JUnitRunner])
+class PropertyTest extends FreeSpec with ShouldMatchers with PropertyChecks {
+  "Namen sollen aus Buchstaben bestehen" - {
+    "alle Namen bestehen aus mehr als einem Buchstaben" in {
+      forAll("name") { (name: String) =>
+        whenever(name != "") {
+          name.length should be > 0;
+        }
+      }
+    }
+  }
+}
+	</pre>
+</section>
+
 <!-- deck.navigation snippet -->
 <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
 <a href="#" class="deck-next-link" title="Next">&#8594;</a>
