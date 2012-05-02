@@ -10,7 +10,7 @@
 	<title>Scala - das Schweizer Taschenmesser</title>
 	
 	<meta name="description" content="A jQuery library for modern HTML presentations">
-	<meta name="author" content="Caleb Troughton">
+	<meta name="author" content="Jan Friderici">
 	<meta name="viewport" content="width=1024, user-scalable=no">
 	
 	<!-- Core and extension CSS files -->
@@ -47,134 +47,7 @@
 <section class="slide" id="title-slide">
 	<h1>Scala - das Schweizer Taschenmesser</h1>
 </section>
-
-<section class="slide" id="whats-up">
-	<h2>Kompliziert ist anders...</h2>
-	<p>Scala kann viel - man muss nur wissen wie, warum und <b>wann</b></p>
-</section>
-
-<section class="slide" id="exceptions">
-	<h2>Exceptions - mal eine andere Option</h2>
-	<pre class="prettyprint lang-scala">
-def tryOr[T](message: String)(action: => T): Option[T] =
-  try {
-    Some(action)
-  } catch {
-    case e: Exception => println(message + "\n" + e.getMessage); None
-  }
-val properties = tryOr("Couldn't read properties") {
-  val props = new Properties()
-  val in = new FileInputStream("Does_not_exist")
-  try {
-    props.load(in)
-    props
-  } finally {
-	in.close()
-}
-	</pre>
-</section>
-
-
-<section class="slide" id="lazy">
-	<h2>Spring + Scala</h2>
-	<pre class="prettyprint lang-scala">
-class Laaazy {
-  lazy val bar = new Bar
-}
-
-public class VerboseLazy {
-  private volatile Bar bar = null;
-  public Bar getBar() {
-    if (bar == null) {
-      synchronized(this) {
-        if (bar == null)
-          bar = new Bar();
-      }
-    }
-    return bar;
-  }
-}
-
-	</pre>
-</section>
-<section class="slide" id="spring_config">
-	<h2>Spring + Scala</h2>
-	<pre class="prettyprint lang-scala">
-object ScalaObjectFactory extends ApplicationContextAware {
-
-  private[this] var ctx:AutowireCapableBeanFactory = _
-
-  def setApplicationContext(applicationContext: ApplicationContext) {
-    this.ctx = applicationContext.getAutowireCapableBeanFactory
-  }
-
-  def autowire[T](bean: T):T = {
-    if (null != ctx) {
-  		ctx.autowireBeanProperties(
-  		bean, 
-  		AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true)
-    }
-  bean
-  }
-}
-	</p>
-</section>
-
-<section class="slide" id="">
-	<h2>Pattern Matching + Function Composition + XML + Servlet API</h2>
-	<pre class="sh_scala">
-val server = new Server(8080);
-
-val handler = JettyPlan.planify {
-  case GET(Path("/hello/world")) =>
-    OK(TextResponse("Hello there!"))
-
-  case GET(Path(Seq("echo" :: text :: _))) =>
-    OK(TextResponse("you said: " + text))
-
-  case req:HttpServletRequest =>
-    NOT_FOUND(HTMLResponse(
-	  &lt;html&gt;
-	    &lt;body&gt;
-	      &lt;p&gt;Ich kann &lt;i&gt;{req.getRequestURI}&lt;/i&gt; nicht finden. Sorry!&lt;/p&gt;
-	      Powerd by Scala! Yuppi
-	    &lt;/body&gt;
-	  &lt;/html&gt;
-    ))
-}
-server.setHandler(handler)
-server.start()
-server.join()
-	</pre>
-</section>
-
-<section class="slide" id="unapply">
-	<h2>Path</h2>
-	<pre class="sh_scala">		
-object Path {
-
-  def apply(req: HttpServletRequest) = req.getRequestURI.split("\\?")(0)
-
-  def unapply(req: HttpServletRequest): Option[String] =
-    Some(req.getRequestURI.split("\\?")(0))
-}
-
-
-object Seq {
-  def unapply(path: String):Option[List[String]] = path.split("/").toList match {
-    case "" :: rest => Some(rest)
-    case all => Some(all)
-  }
-}
-	</pre>
-</section>
-
-<section class="slide" id="einheiten">
-	<h2>Exceptions - mal eine andere Option</h2>
-	<pre class="sh_scala">		
-
-	</pre>
-</section>
+<!-- Maxim -->
 <section class="slide" id="Zitate">
 	<h2>Zitate die gut zu Scala passen</h2>
 	<blockquote class="slide"cite="http://example.com" id="z1">
@@ -399,6 +272,251 @@ class PropertyTest extends FreeSpec with ShouldMatchers with PropertyChecks {
 }
 	</pre>
 </section>
+
+<!-- Jan -->
+
+<section class="slide" id="scalajee">
+	<h1>Scala in Java (EE) Projekten</h1>
+</section>
+<section class="slide" id="scalajee-www">
+	<h2>Scala in Java (EE) Projekten</h2>
+	<ul>
+		<li class="slide">wieso, weshalb, warum....</li>
+			<ul>
+				<li class="slide">Pattern Matching</li>
+				<li class="slide">Functionale Programmierung (Funktions Komposition)</li>
+				<li class="slide">Nebenläufigkeit(Actor und _.par)</li>
+				<li class="slide">Typ Inferenz</li>
+				<li class="slide">Traits</li>
+				<li class="slide">XML Literale</li>				
+				<li class="slide">...</li>
+			</ul>
+		<li class="slide">... und <strong>wie!</strong></li>
+	</ul>
+</section>
+
+<section class="slide" id="pm_1">
+	<h2>warum: <br/>Pattern Matching<h2>
+	<img src="img/Three_tartans.jpg"/>
+</section>
+
+<section class="slide" id="pm_2">
+	<h2>wie: Pattern Matching</h2>
+	<pre class="prettyprint lang-scala">
+case class Person(firstName: String, lastName: String, anrede: String, age: Int)
+
+Person("Jan", "Friderici", "Herr") match {
+  case Person(_, name, anrede) => println("Hallo %s %s".format(anrede, name))
+  case _ => println("Will not happen")
+}
+
+object Email{
+  // extractor!
+  def unapply(in: String):Option[(String,String)] = {
+    val parts = in.split("@")
+    if (parts.size == 2) Some(parts(0), parts(1)) else None
+ }
+}
+val Email(name,domain) ="jan@friderici.net"
+> name: String = jan
+> domain: String = friderici.net
+	</pre>
+</section>
+
+<section class="slide" id="functional">
+	<h2>warum: <br/>Funktionale Programmierung<h2>
+<!--	<img src="img/Ludwig-van-Beethoven.jpg"/>-->
+	<object data="img/Lambda_logo.svg" type="image/svg+xml" width="365" height="365">
+    	<param name="src" value="uhr.svg">
+    	Ihr Browser kann das Objekt leider nicht anzeigen!
+  </object>
+</section>
+
+<section class="slide" id="function_composition">
+	<h2>Funktionale Programmierung:</h2>
+	<h3>Function Composition</h3>
+	<pre class="prettyprint lang-scala">
+case class Person(firstName: String, lastName: String, anrede: String, age: Int)
+
+val isAdult: (Int) => Boolean = age => age >= 18
+
+val personsAge: (Person) => Int = person => person.age
+	
+val personIsAdult = isAdult compose personsAge
+
+val (adults, minors) = List(
+	Person("Jan", "Friderici", "Herr", 38),
+	Person("len", "Friderici", "Kleiner Mann", 3)
+) partition (personIsAdult)
+	</pre>
+</section>
+
+<section class="slide" id="higher_order">
+	<h2>Funktionale Programmierung:</h2>
+	<h3>map, flatmap filter und for</h3>
+	<pre class="prettyprint lang-scala">
+val people = List(Person("Jan", "Friderici", "Herr", 38),
+  Person("len", "Friderici", "Kleiner Mann", 3),
+  Person("Obi", "Wan", "Jedi", 33))
+
+val fridericis = people filter {_.lastName == "Friderici"} map {_.firstName}
+
+// won't work...;-)
+val fridericis = for {
+	person <- people
+	if (person.lastName == "Friderici")
+} yield person.firstName
+	</pre>
+</section>
+
+<section class="slide" id="exceptions">
+	<h2>Exceptions - mal eine andere Option</h2>
+	<pre class="prettyprint lang-scala">
+def tryOr[T](message: String)(action: => T): Option[T] =
+  try {
+    Some(action)
+  } catch {
+    case e: Exception => println(message + "\n" + e.getMessage); None
+  }
+val properties = tryOr("Couldn't read properties") {
+  val props = new Properties()
+  val in = new FileInputStream("Does_not_exist")
+  try {
+    props.load(in)
+    props
+  } finally {
+    in.close()
+}
+	</pre>
+</section>
+
+<section class="slide" id="simpleweb">
+	<h2>Kombinationen....<h2>
+  </object>
+</section>
+
+<section class="slide" id="simpleweb">
+	<h2>Pattern Matching + <br/>Function Composition = Web Framework</h2>
+	<pre class="prettyprint lang-scala">
+object SimpleWebServer {
+  def main(args: Array[String]) {
+    val server = new Server(8080);
+
+    val handler = JettyPlan.planify {
+
+      case GET(Path("/hello/world")) =>
+        OK(TextResponse("Hello there!"))
+
+      case GET(Path(Seq("echo" :: text :: _))) =>
+        OK(TextResponse("you said: " + text))
+
+      case req:HttpServletRequest =>
+        NOT_FOUND(HTMLResponse(
+          &lt;html&gt;
+            &lt;body&gt;
+              &lt;p&gt;Ich kann &lt;i&gt;{req.getRequestURI}&lt;/i&gt; nicht finden. Sorry!&lt;/p&gt;
+               Powerd by Scala
+            &lt;/body&gt;
+          &lt;/html&gt;
+      ))
+  }
+  server.setHandler(handler)
+  server.start()
+  server.join()
+  }
+}
+	</pre>
+</section>
+
+<section class="slide" id="pm_4">
+	<h2>Pattern Matching - auf Requests</h2>
+	<pre class="prettyprint lang-scala">
+object Path {
+  def apply(req: HttpServletRequest) = req.getRequestURI.split("\\?")(0)
+  def unapply(req: HttpServletRequest): Option[String] =
+  	Some(req.getRequestURI.split("\\?")(0))
+}
+object Seq {
+  def unapply(path: String):Option[List[String]] = path.split("/").toList match {
+    case "" :: rest => Some(rest)
+    case all => Some(all)
+  }
+}
+abstract class HttpMethod(name: String) {
+  def unapply(req: HttpServletRequest) =
+  if (name.equalsIgnoreCase(req.getMethod)) Some(req) 
+  else None
+}
+
+object GET extends HttpMethod("GET")
+...
+
+object JettyPlan {
+  def planify(intent: Plan.Intent) = new AbstractHandler {
+    def handle(path: String, req: Request, request: HttpServletRequest, response: HttpServletResponse) {      
+      if (intent.isDefinedAt(request)) {
+        try {
+          intent(request)(response)
+        } finally {
+          response.getOutputStream.flush()
+        }
+      } else {
+        println("No handler found for: " + p1) // TODO :-D
+      }
+    }
+  }
+}
+	</pre>
+</section>
+
+
+
+<!-- Entwürfe -->
+<section class="slide" id="lazy">
+	<h2>Spring + Scala</h2>
+	<pre class="prettyprint lang-scala">
+class Laaazy {
+  lazy val bar = new Bar
+}
+
+public class VerboseLazy {
+  private volatile Bar bar = null;
+  public Bar getBar() {
+    if (bar == null) {
+      synchronized(this) {
+        if (bar == null)
+          bar = new Bar();
+      }
+    }
+    return bar;
+  }
+}
+
+	</pre>
+</section>
+<section class="slide" id="spring_config">
+	<h2>Spring + Scala</h2>
+	<pre class="prettyprint lang-scala">
+object ScalaObjectFactory extends ApplicationContextAware {
+
+  private[this] var ctx:AutowireCapableBeanFactory = _
+
+  def setApplicationContext(applicationContext: ApplicationContext) {
+    this.ctx = applicationContext.getAutowireCapableBeanFactory
+  }
+
+  def autowire[T](bean: T):T = {
+    if (null != ctx) {
+  		ctx.autowireBeanProperties(
+  		bean, 
+  		AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true)
+    }
+  bean
+  }
+}
+	</p>
+</section>
+
 
 <!-- deck.navigation snippet -->
 <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
